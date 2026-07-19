@@ -2,12 +2,35 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"image/color"
 
+	"github.com/axfrancis/go-qrcode"
 	"github.com/phpdave11/gofpdf"
-	"github.com/skip2/go-qrcode"
 )
 
-func generatePDF() ([]byte, error) {
+type Category struct {
+	Name      string
+	Values    string
+	Icon      string
+	BrandIcon bool
+}
+
+type Person struct {
+	FirstName       string
+	LastName        string
+	Location        string
+	Phone           string
+	Email           string
+	LinkedIn        string
+	GitHub          string
+	Url             string
+	QrUrl           string
+	Summary         string
+	TechnicalSkills []Category
+}
+
+func generatePDF(person Person) ([]byte, error) {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	margin := 12.0
 	x := margin
@@ -19,15 +42,20 @@ func generatePDF() ([]byte, error) {
 	linkWidth := 48.0
 	cellHeight := 5.75
 	qrSize := 20.0
+	paddingWidth := 3.0
+	paddingHeight := 2.5
 	// var storedX float64
 	var storedY float64
+
+	pdf.SetMargins(margin, margin, margin)
 
 	pdf.AddUTF8Font("Inter", "", "fonts/Inter/static/Inter_18pt-Regular.ttf")
 	pdf.AddUTF8Font("Inter", "B", "fonts/Inter/static/Inter_18pt-Bold.ttf")
 	pdf.AddUTF8Font("FASolid", "", "fonts/FontAwesome/fa-solid-900.ttf")
 	pdf.AddUTF8Font("FABrands", "", "fonts/FontAwesome/fa-brands-400.ttf")
 
-	qrPng, qrErr := qrcode.Encode("https://github.com/axfrancis/GO-GETAJOB", qrcode.Medium, int(qrSize))
+	// header
+	qrPng, qrErr := qrcode.EncodeWithColor("https://"+person.QrUrl, qrcode.Medium, int(qrSize*4), color.RGBA{100, 100, 100, 255}, color.White)
 
 	if qrErr != nil {
 		panic(qrErr)
@@ -40,16 +68,16 @@ func generatePDF() ([]byte, error) {
 	pdf.SetXY(x, y)
 	pdf.SetFont("Inter", "B", 28)
 	pdf.SetTextColor(100, 100, 100)
-	pdf.MultiCell(nameWidth, 9, "Anthony\nFrancis", "", "L", false)
+	pdf.MultiCell(nameWidth, 9, fmt.Sprintf("%s\n%s", person.FirstName, person.LastName), "", "L", false)
 
-	x = pageWidth - margin - (linkWidth + iconWidth) - (contactWidth + iconWidth) - qrSize - 12 - 12
+	x = pageWidth - margin - (linkWidth + iconWidth) - (contactWidth + iconWidth) - qrSize - (paddingWidth * 4)
 	y += 0.5
 	pdf.SetXY(x, y)
 	pdf.SetFont("FASolid", "", 10)
 	pdf.Cell(iconWidth, cellHeight, "\uf57e")
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Inter", "", 11)
-	pdf.CellFormat(contactWidth, cellHeight, "Melbourne, VIC", "", 0, "R", false, 0, "")
+	pdf.CellFormat(contactWidth, cellHeight, person.Location, "", 0, "R", false, 0, "")
 
 	storedY = y
 	y += cellHeight
@@ -59,7 +87,7 @@ func generatePDF() ([]byte, error) {
 	pdf.Cell(iconWidth, cellHeight, "\uf879")
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Inter", "", 11)
-	pdf.CellFormat(contactWidth, cellHeight, "+61 475 305 593", "", 0, "R", false, 0, "")
+	pdf.CellFormat(contactWidth, cellHeight, person.Phone, "", 0, "R", false, 0, "")
 
 	y += cellHeight
 	pdf.SetXY(x, y)
@@ -68,17 +96,17 @@ func generatePDF() ([]byte, error) {
 	pdf.Cell(iconWidth, cellHeight, "\uf0e0")
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Inter", "", 11)
-	pdf.CellFormat(contactWidth, cellHeight, "gday@axf.id.au", "", 0, "R", false, 0, "")
+	pdf.CellFormat(contactWidth, cellHeight, person.Email, "", 0, "R", false, 0, "")
 
 	y = storedY
-	x = pageWidth - margin - (linkWidth + iconWidth) - (qrSize + 2) - 10
+	x = pageWidth - margin - (linkWidth + iconWidth) - qrSize - (paddingWidth * 2)
 	pdf.SetXY(x, y)
 	pdf.SetTextColor(100, 100, 100)
 	pdf.SetFont("FABrands", "", 10)
 	pdf.Cell(iconWidth, cellHeight, "\uf08c")
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Inter", "", 11)
-	pdf.CellFormat(linkWidth, cellHeight, "linkedin.com/in/axfrancis", "", 0, "R", false, 0, "https://linkedin.com/axfrancis")
+	pdf.CellFormat(linkWidth, cellHeight, "linkedin.com/in/"+person.LinkedIn, "", 0, "R", false, 0, "https://linkedin.com/"+person.LinkedIn)
 
 	y += cellHeight
 	pdf.SetXY(x, y)
@@ -87,7 +115,7 @@ func generatePDF() ([]byte, error) {
 	pdf.Cell(iconWidth, cellHeight, "\uf09b")
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Inter", "", 11)
-	pdf.CellFormat(linkWidth, cellHeight, "github.com/axfrancis", "", 0, "R", false, 0, "https://github.com/axfrancis")
+	pdf.CellFormat(linkWidth, cellHeight, "github.com/"+person.GitHub, "", 0, "R", false, 0, "https://github.com/"+person.GitHub)
 
 	y += cellHeight
 	pdf.SetXY(x, y)
@@ -96,21 +124,61 @@ func generatePDF() ([]byte, error) {
 	pdf.Cell(iconWidth, cellHeight, "\uf5bc")
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Inter", "", 11)
-	pdf.CellFormat(linkWidth, cellHeight, "axf.id.au/case-studies", "", 0, "R", false, 0, "https://axf.id.au/case-studies")
+	pdf.CellFormat(linkWidth, cellHeight, person.Url, "", 0, "R", false, 0, "https://"+person.Url)
 
-	y = storedY - 1.25
-	x = pageWidth - margin - qrSize
-	pdf.ImageOptions("qr", x, y, qrSize, qrSize, false, gofpdf.ImageOptions{}, 0, "https://github.com/axfrancis/GO-GETAJOB")
+	y = storedY - 1.5
+	x = pageWidth - margin - qrSize - 1
+	pdf.ImageOptions("qr", x, y, qrSize, qrSize, false, gofpdf.ImageOptions{}, 0, "https://"+person.QrUrl)
 
 	y += cellHeight * 3
-	x = pageWidth - margin - qrSize - 6
+	x = pageWidth - margin - qrSize - paddingWidth
 	pdf.SetDrawColor(225, 225, 225)
 	pdf.Line(x, storedY+2.5, x, y-2.5)
-	x -= linkWidth + iconWidth + 12
+	x -= linkWidth + iconWidth + (paddingWidth * 2)
 	pdf.Line(x, storedY+2.5, x, y-2.5)
 
-	y += 5
+	y += paddingHeight + 1.5
 	pdf.Line(margin, y, pageWidth-margin, y)
+
+	// body
+	x = margin
+	y += paddingHeight
+	cellHeight = 5
+	pdf.SetXY(x, y)
+	pdf.SetFontSize(12)
+	pdf.MultiCell(0, cellHeight, person.Summary, "", "L", false)
+
+	y = pdf.GetY() + paddingHeight
+	pdf.Line(margin, y, pageWidth-margin, y)
+
+	y += paddingHeight
+	pdf.SetXY(x, y)
+
+	for _, c := range person.TechnicalSkills {
+		var icon string
+		if c.Icon == "" {
+			icon = "\uf111"
+		} else {
+			icon = c.Icon
+		}
+		pdf.SetX(margin)
+		pdf.SetFont("Inter", "B", 11)
+		pdf.MultiCell(0, cellHeight+1.5, c.Name, "", "L", false)
+		if c.BrandIcon {
+			pdf.SetFont("FABrands", "", 10)
+		} else {
+			pdf.SetFont("FASolid", "", 10)
+		}
+		pdf.SetX(pdf.GetX() + 3.5)
+		pdf.CellFormat(iconWidth, iconWidth, icon, "", 0, "C", false, 0, "")
+		pdf.SetFont("Inter", "", 11)
+		pdf.SetX(pdf.GetX() + 2)
+		pdf.MultiCell(0, cellHeight, c.Values, "", "L", false)
+	}
+
+	y = pdf.GetY() + paddingHeight
+	pdf.Line(margin, y, pageWidth-margin, y)
+	y += paddingHeight
 
 	var buffer bytes.Buffer
 
