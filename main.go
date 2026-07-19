@@ -14,14 +14,14 @@ func resume(w http.ResponseWriter, r *http.Request) {
 		FirstName: "Anthony",
 		LastName:  "Francis",
 		Location:  "Melbourne, VIC",
-		Phone:     "+61 475 305 593",
+		Phone:     "+61 416 769 371",
 		Email:     "gday@axf.id.au",
 		LinkedIn:  "axfrancis",
 		GitHub:    "axfrancis",
 		Url:       "axf.id.au/case-studies",
 		QrUrl:     "github.com/axfrancis/GO-GETAJOB",
-		Summary:   "Senior Software Developer with 8+ years of experience building high-availability critical retail infrastructure, software, and apps with a holistic philosophy and keen eye for customer experience. Strong background in Node, TypeScript/JavaScript, React/React Native, C#/.NET, and deployment through AWS CloudFormation. Proven track record modernising legacy systems, migrating software architectures, and delivering critical software used nationwide.",
-		TechnicalSkills: []Category{
+		Summary:   "Senior Software Developer with 8+ years of experience building high-availability critical retail infrastructure, software, and apps with a holistic philosophy, a keen eye for design, and a passion for customer experience. Proven track record modernising legacy systems, migrating software architectures, and delivering software to handle thousands of daily transactions, providing faster and more reliable results, leading to higher customer satisfaction.",
+		TechnicalSkills: []TechSkill{
 			{
 				Icon:   "\uf188",
 				Name:   "Languages",
@@ -42,6 +42,27 @@ func resume(w http.ResponseWriter, r *http.Request) {
 				Icon:   "\uf1c0",
 				Name:   "Databases",
 				Values: "SQL Server, MySQL/MariaDB, Redis, AWS DynamoDB",
+			},
+		},
+		JobHistory: []Job{
+			{
+				Company: "Officeworks",
+				Title:   "Application Developer",
+				Start:   "Jul 2018",
+				End:     "Oct 2021",
+				Achievements: []string{
+					"Defeated all enemies in single combat",
+				},
+			},
+			{
+				Company: "Officeworks",
+				Title:   "Junior Developer",
+				Start:   "Sep 2017",
+				End:     "Jul 2018",
+				Achievements: []string{
+					"Supported & developed HTML/CSS/JavaScript Cordova iOS apps",
+					"Developed & maintained Nightwatch automated tests",
+				},
 			},
 		},
 	}

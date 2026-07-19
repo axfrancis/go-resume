@@ -9,11 +9,19 @@ import (
 	"github.com/phpdave11/gofpdf"
 )
 
-type Category struct {
+type TechSkill struct {
 	Name      string
 	Values    string
 	Icon      string
 	BrandIcon bool
+}
+
+type Job struct {
+	Company      string
+	Title        string
+	Start        string
+	End          string
+	Achievements []string
 }
 
 type Person struct {
@@ -27,7 +35,8 @@ type Person struct {
 	Url             string
 	QrUrl           string
 	Summary         string
-	TechnicalSkills []Category
+	TechnicalSkills []TechSkill
+	JobHistory      []Job
 }
 
 func generatePDF(person Person) ([]byte, error) {
@@ -146,13 +155,14 @@ func generatePDF(person Person) ([]byte, error) {
 	cellHeight = 5
 	pdf.SetXY(x, y)
 	pdf.SetFontSize(12)
-	pdf.MultiCell(0, cellHeight, person.Summary, "", "L", false)
+	pdf.MultiCell(0, cellHeight, person.Summary, "", "J", false)
 
 	y = pdf.GetY() + paddingHeight
 	pdf.Line(margin, y, pageWidth-margin, y)
 
 	y += paddingHeight
 	pdf.SetXY(x, y)
+	cellHeight++
 
 	for _, c := range person.TechnicalSkills {
 		var icon string
@@ -163,14 +173,16 @@ func generatePDF(person Person) ([]byte, error) {
 		}
 		pdf.SetX(margin)
 		pdf.SetFont("Inter", "B", 11)
-		pdf.MultiCell(0, cellHeight+1.5, c.Name, "", "L", false)
+		pdf.MultiCell(0, cellHeight, c.Name, "", "L", false)
 		if c.BrandIcon {
 			pdf.SetFont("FABrands", "", 10)
 		} else {
 			pdf.SetFont("FASolid", "", 10)
 		}
 		pdf.SetX(pdf.GetX() + 3.5)
+		pdf.SetTextColor(100, 100, 100)
 		pdf.CellFormat(iconWidth, iconWidth, icon, "", 0, "C", false, 0, "")
+		pdf.SetTextColor(0, 0, 0)
 		pdf.SetFont("Inter", "", 11)
 		pdf.SetX(pdf.GetX() + 2)
 		pdf.MultiCell(0, cellHeight, c.Values, "", "L", false)
@@ -179,6 +191,28 @@ func generatePDF(person Person) ([]byte, error) {
 	y = pdf.GetY() + paddingHeight
 	pdf.Line(margin, y, pageWidth-margin, y)
 	y += paddingHeight
+	pdf.SetY(y)
+
+	for _, j := range person.JobHistory {
+		pdf.SetFontSize(12)
+		pdf.SetFontStyle("B")
+		pdf.Cell(30, cellHeight, j.Company)
+		pdf.SetFontSize(11)
+		pdf.SetFontStyle("")
+		pdf.Cell(30, cellHeight, j.Start+" - "+j.End)
+		pdf.SetXY(margin, pdf.GetY()+cellHeight)
+		pdf.MultiCell(0, cellHeight, j.Title, "", "L", false)
+
+		for _, a := range j.Achievements {
+			pdf.SetX(margin + 2)
+			pdf.SetFont("FASolid", "", 4)
+			pdf.CellFormat(iconWidth, cellHeight, "\uf111", "", 0, "C", false, 0, "")
+			pdf.SetFont("Inter", "", 11)
+			pdf.MultiCell(0, cellHeight, a, "", "L", false)
+		}
+
+		pdf.SetXY(margin, pdf.GetY()+3.0)
+	}
 
 	var buffer bytes.Buffer
 
