@@ -2,12 +2,16 @@ package main
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"image/color"
 
 	"github.com/axfrancis/go-qrcode"
 	"github.com/phpdave11/gofpdf"
 )
+
+//go:embed fonts/*
+var assets embed.FS
 
 type TechSkill struct {
 	Name      string
@@ -39,7 +43,7 @@ type Person struct {
 	JobHistory      []Job
 }
 
-func generatePDF(person Person) ([]byte, error) {
+func generatePDF(person Person, settings pdfSettings) ([]byte, error) {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	margin := 12.0
 	x := margin
@@ -53,18 +57,24 @@ func generatePDF(person Person) ([]byte, error) {
 	qrSize := 20.0
 	paddingWidth := 3.0
 	paddingHeight := 2.5
-	// var storedX float64
 	var storedY float64
+	interRegular, _ := assets.ReadFile("fonts/Inter/static/Inter_18pt-Regular.ttf")
+	interBold, _ := assets.ReadFile("fonts/Inter/static/Inter_18pt-Bold.ttf")
+	caveatBold, _ := assets.ReadFile("fonts/Caveat/static/Caveat-Bold.ttf")
+	faSolid, _ := assets.ReadFile("fonts/FontAwesome/fa-solid-900.ttf")
+	faBrands, _ := assets.ReadFile("fonts/FontAwesome/fa-brands-400.ttf")
 
 	pdf.SetMargins(margin, margin, margin)
+	pdf.SetAutoPageBreak(true, margin)
 
-	pdf.AddUTF8Font("Inter", "", "fonts/Inter/static/Inter_18pt-Regular.ttf")
-	pdf.AddUTF8Font("Inter", "B", "fonts/Inter/static/Inter_18pt-Bold.ttf")
-	pdf.AddUTF8Font("FASolid", "", "fonts/FontAwesome/fa-solid-900.ttf")
-	pdf.AddUTF8Font("FABrands", "", "fonts/FontAwesome/fa-brands-400.ttf")
+	pdf.AddUTF8FontFromBytes("Inter", "", interRegular)
+	pdf.AddUTF8FontFromBytes("Inter", "B", interBold)
+	pdf.AddUTF8FontFromBytes("Caveat", "B", caveatBold)
+	pdf.AddUTF8FontFromBytes("FASolid", "", faSolid)
+	pdf.AddUTF8FontFromBytes("FABrands", "", faBrands)
 
 	// header
-	qrPng, qrErr := qrcode.EncodeWithColor("https://"+person.QrUrl, qrcode.Medium, int(qrSize*4), color.RGBA{100, 100, 100, 255}, color.White)
+	qrPng, qrErr := qrcode.EncodeWithColor("https://"+person.QrUrl, qrcode.Medium, int(qrSize*4), color.RGBA{uint8(settings.accent.red), uint8(settings.accent.green), uint8(settings.accent.blue), 255}, color.White)
 
 	if qrErr != nil {
 		panic(qrErr)
@@ -76,7 +86,7 @@ func generatePDF(person Person) ([]byte, error) {
 
 	pdf.SetXY(x, y)
 	pdf.SetFont("Inter", "B", 28)
-	pdf.SetTextColor(100, 100, 100)
+	pdf.SetTextColor(settings.accent.red, settings.accent.green, settings.accent.blue)
 	pdf.MultiCell(nameWidth, 9, fmt.Sprintf("%s\n%s", person.FirstName, person.LastName), "", "L", false)
 
 	x = pageWidth - margin - (linkWidth + iconWidth) - (contactWidth + iconWidth) - qrSize - (paddingWidth * 4)
@@ -84,54 +94,54 @@ func generatePDF(person Person) ([]byte, error) {
 	pdf.SetXY(x, y)
 	pdf.SetFont("FASolid", "", 10)
 	pdf.Cell(iconWidth, cellHeight, "\uf57e")
-	pdf.SetTextColor(0, 0, 0)
+	pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
 	pdf.SetFont("Inter", "", 11)
 	pdf.CellFormat(contactWidth, cellHeight, person.Location, "", 0, "R", false, 0, "")
 
 	storedY = y
 	y += cellHeight
 	pdf.SetXY(x, y)
-	pdf.SetTextColor(100, 100, 100)
+	pdf.SetTextColor(settings.accent.red, settings.accent.green, settings.accent.blue)
 	pdf.SetFont("FASolid", "", 10)
 	pdf.Cell(iconWidth, cellHeight, "\uf879")
-	pdf.SetTextColor(0, 0, 0)
+	pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
 	pdf.SetFont("Inter", "", 11)
 	pdf.CellFormat(contactWidth, cellHeight, person.Phone, "", 0, "R", false, 0, "")
 
 	y += cellHeight
 	pdf.SetXY(x, y)
-	pdf.SetTextColor(100, 100, 100)
+	pdf.SetTextColor(settings.accent.red, settings.accent.green, settings.accent.blue)
 	pdf.SetFont("FASolid", "", 10)
 	pdf.Cell(iconWidth, cellHeight, "\uf0e0")
-	pdf.SetTextColor(0, 0, 0)
+	pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
 	pdf.SetFont("Inter", "", 11)
 	pdf.CellFormat(contactWidth, cellHeight, person.Email, "", 0, "R", false, 0, "")
 
 	y = storedY
 	x = pageWidth - margin - (linkWidth + iconWidth) - qrSize - (paddingWidth * 2)
 	pdf.SetXY(x, y)
-	pdf.SetTextColor(100, 100, 100)
+	pdf.SetTextColor(settings.accent.red, settings.accent.green, settings.accent.blue)
 	pdf.SetFont("FABrands", "", 10)
 	pdf.Cell(iconWidth, cellHeight, "\uf08c")
-	pdf.SetTextColor(0, 0, 0)
+	pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
 	pdf.SetFont("Inter", "", 11)
 	pdf.CellFormat(linkWidth, cellHeight, "linkedin.com/in/"+person.LinkedIn, "", 0, "R", false, 0, "https://linkedin.com/"+person.LinkedIn)
 
 	y += cellHeight
 	pdf.SetXY(x, y)
-	pdf.SetTextColor(100, 100, 100)
+	pdf.SetTextColor(settings.accent.red, settings.accent.green, settings.accent.blue)
 	pdf.SetFont("FABrands", "", 10)
 	pdf.Cell(iconWidth, cellHeight, "\uf09b")
-	pdf.SetTextColor(0, 0, 0)
+	pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
 	pdf.SetFont("Inter", "", 11)
 	pdf.CellFormat(linkWidth, cellHeight, "github.com/"+person.GitHub, "", 0, "R", false, 0, "https://github.com/"+person.GitHub)
 
 	y += cellHeight
 	pdf.SetXY(x, y)
-	pdf.SetTextColor(100, 100, 100)
+	pdf.SetTextColor(settings.accent.red, settings.accent.green, settings.accent.blue)
 	pdf.SetFont("FASolid", "", 10)
 	pdf.Cell(iconWidth, cellHeight, "\uf5bc")
-	pdf.SetTextColor(0, 0, 0)
+	pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
 	pdf.SetFont("Inter", "", 11)
 	pdf.CellFormat(linkWidth, cellHeight, person.Url, "", 0, "R", false, 0, "https://"+person.Url)
 
@@ -139,7 +149,18 @@ func generatePDF(person Person) ([]byte, error) {
 	x = pageWidth - margin - qrSize - 1
 	pdf.ImageOptions("qr", x, y, qrSize, qrSize, false, gofpdf.ImageOptions{}, 0, "https://"+person.QrUrl)
 
-	y += cellHeight * 3
+	y = storedY - 5
+	x = pageWidth - margin - qrSize - 1 - 31.5
+	pdf.SetXY(x, y)
+	pdf.SetTextColor(settings.accent.red, settings.accent.green, settings.accent.blue)
+	pdf.SetFont("Caveat", "B", 10.5)
+	pdf.Cell(45, iconWidth, "See how this PDF was generated!")
+	pdf.SetFont("FASolid", "", 10)
+	pdf.Cell(iconWidth, iconWidth, "\uf0ab")
+	pdf.SetFont("Inter", "", 11)
+	pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
+
+	y = storedY - 1.5 + (cellHeight * 3)
 	x = pageWidth - margin - qrSize - paddingWidth
 	pdf.SetDrawColor(225, 225, 225)
 	pdf.Line(x, storedY+2.5, x, y-2.5)
@@ -162,7 +183,7 @@ func generatePDF(person Person) ([]byte, error) {
 
 	y += paddingHeight
 	pdf.SetXY(x, y)
-	cellHeight++
+	cellHeight += 0.5
 
 	for _, c := range person.TechnicalSkills {
 		var icon string
@@ -180,9 +201,9 @@ func generatePDF(person Person) ([]byte, error) {
 			pdf.SetFont("FASolid", "", 10)
 		}
 		pdf.SetX(pdf.GetX() + 3.5)
-		pdf.SetTextColor(100, 100, 100)
+		pdf.SetTextColor(settings.accent.red, settings.accent.green, settings.accent.blue)
 		pdf.CellFormat(iconWidth, iconWidth, icon, "", 0, "C", false, 0, "")
-		pdf.SetTextColor(0, 0, 0)
+		pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
 		pdf.SetFont("Inter", "", 11)
 		pdf.SetX(pdf.GetX() + 2)
 		pdf.MultiCell(0, cellHeight, c.Values, "", "L", false)
@@ -193,18 +214,24 @@ func generatePDF(person Person) ([]byte, error) {
 	y += paddingHeight
 	pdf.SetY(y)
 
+	cellHeight = 5
+
 	for _, j := range person.JobHistory {
 		pdf.SetFontSize(12)
 		pdf.SetFontStyle("B")
 		pdf.Cell(30, cellHeight, j.Company)
 		pdf.SetFontSize(11)
 		pdf.SetFontStyle("")
+		pdf.SetTextColor(settings.accent.red, settings.accent.green, settings.accent.blue)
 		pdf.Cell(30, cellHeight, j.Start+" - "+j.End)
+		pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
 		pdf.SetXY(margin, pdf.GetY()+cellHeight)
-		pdf.MultiCell(0, cellHeight, j.Title, "", "L", false)
+		pdf.SetFontStyle("B")
+		pdf.MultiCell(0, cellHeight+1, j.Title, "", "L", false)
+		pdf.SetFontStyle("")
 
 		for _, a := range j.Achievements {
-			pdf.SetX(margin + 2)
+			pdf.SetXY(margin+2, pdf.GetY()+0.75)
 			pdf.SetFont("FASolid", "", 4)
 			pdf.CellFormat(iconWidth, cellHeight, "\uf111", "", 0, "C", false, 0, "")
 			pdf.SetFont("Inter", "", 11)
@@ -213,6 +240,11 @@ func generatePDF(person Person) ([]byte, error) {
 
 		pdf.SetXY(margin, pdf.GetY()+3.0)
 	}
+
+	y = pdf.GetY() + paddingHeight
+	pdf.Line(margin, y, pageWidth-margin, y)
+	y += paddingHeight
+	pdf.SetY(y)
 
 	var buffer bytes.Buffer
 
