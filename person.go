@@ -43,7 +43,7 @@ func getPerson() (person Person) {
 		GitHub:    "axfrancis",
 		Url:       "axf.id.au/case-studies",
 		QrUrl:     "github.com/axfrancis/go-resume",
-		Summary:   "Senior Software Developer with 8+ years of experience building high-availability retail infrastructure, software, and apps. Combining a keen eye for design, a passion for customer experience, and a systems engineering approach to software engineering -- understanding the entire process from user need to business outcome, seeking the simplest solution with the greatest value. Experienced in modernising legacy systems, reducing operational costs, and delivering reliable, maintainable software.",
+		Summary:   "Senior Software Developer with 8+ years of experience building high-availability retail infrastructure, software, and apps. Combining a keen eye for design, a passion for customer experience, and a systems engineering approach to software -- understanding the entire process from user need to business outcome, seeking the simplest solution with the greatest value. Experienced in modernising legacy systems, reducing operational costs, and delivering reliable, maintainable software.",
 		TechnicalSkills: []TechSkill{
 			{
 				Icon:   "\uf188",
