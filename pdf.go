@@ -228,7 +228,7 @@ func generateJobHistory(pdf *gofpdf.Fpdf, person Person, settings PDFSettings, p
 
 func generateMajorProjects(pdf *gofpdf.Fpdf, person Person, settings PDFSettings, pageStyle PageStyle) {
 	sectionStyle := SectionStyle{
-		cellHeight: 5,
+		cellHeight: 5.5,
 		iconWidth:  5,
 	}
 	pdf.SetFontSize(14)
@@ -248,14 +248,14 @@ func generateMajorProjects(pdf *gofpdf.Fpdf, person Person, settings PDFSettings
 		pdf.Cell(30, sectionStyle.cellHeight, j.Start+" - "+j.End)
 		pdf.SetTextColor(settings.color.red, settings.color.green, settings.color.blue)
 		pdf.SetXY(pageStyle.margin, pdf.GetY()+sectionStyle.cellHeight+1)
-		pdf.MultiCell(0, sectionStyle.cellHeight-0.5, j.Description, "", "J", false)
+		pdf.MultiCell(0, sectionStyle.cellHeight, j.Description, "", "J", false)
 
 		for _, a := range j.Achievements {
 			pdf.SetXY(pageStyle.margin+2, pdf.GetY()+0.75)
 			pdf.SetFont("FASolid", "", 4)
 			pdf.CellFormat(sectionStyle.iconWidth, sectionStyle.cellHeight, "\uf111", "", 0, "C", false, 0, "")
 			pdf.SetFont("Inter", "", 11)
-			pdf.MultiCell(0, sectionStyle.cellHeight-0.5, a, "", "L", false)
+			pdf.MultiCell(0, sectionStyle.cellHeight, a, "", "L", false)
 		}
 
 		pdf.SetXY(pageStyle.margin, pdf.GetY()+3.0)

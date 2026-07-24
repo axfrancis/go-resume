@@ -42,8 +42,8 @@ func getPerson() (person Person) {
 		LinkedIn:  "axfrancis",
 		GitHub:    "axfrancis",
 		Url:       "axf.id.au/case-studies",
-		QrUrl:     "github.com/axfrancis/GO-GETAJOB",
-		Summary:   "Senior Software Developer with 8+ years of experience building high-availability critical retail infrastructure, software, and apps with a holistic philosophy, a keen eye for design, and a passion for customer experience. Proven track record modernising legacy systems, migrating software architectures, and delivering software that handles thousands of daily transactions, provides faster and more reliable results, and leads to higher customer satisfaction.",
+		QrUrl:     "github.com/axfrancis/go-resume",
+		Summary:   "Senior Software Developer with 8+ years of experience building high-availability retail infrastructure, software, and apps. Combining a keen eye for design, a passion for customer experience, and a systems engineering approach to software engineering -- understanding the entire process from user need to business outcome, seeking the simplest solution with the greatest value. Experienced in modernising legacy systems, reducing operational costs, and delivering reliable, maintainable software.",
 		TechnicalSkills: []TechSkill{
 			{
 				Icon:   "\uf188",
@@ -79,7 +79,6 @@ func getPerson() (person Person) {
 					"Identified and implemented cost-saving measures in cloud infrastructure, including demand-based scaling and consolidation of microservices, saving tens of thousands of dollars each year",
 					"Ensured continuity of service during migration of PDT devices from iOS to Android, integrating new hardware with existing apps",
 					"Performed Pentest/Audit remediation, added code linting infrastructure, and contibuted to unit testing, improving developer coding experience, and ensuring PCI compliance",
-					"Coached junior developers, conducting peer reviews, training, and mentoring",
 				},
 			},
 			{
@@ -137,8 +136,10 @@ func getPerson() (person Person) {
 				Title:       "Free Cell Ad-Free",
 				Start:       "2020",
 				End:         "Present",
-				Description: `Started during the COVID pandemic as a way to pass the time, Free Cell Ad-Free is a React Native/TypeScript based game, inspired by Microsoft's FreeCell: free to play card games with no interruptions.`,
+				Description: `Started during the COVID pandemic as a way to pass the time without being constantly interrupted by ads, Free Cell Ad-Free is a React Native/TypeScript based game, inspired by Microsoft's FreeCell: free to play card games with no interruptions.`,
 				Achievements: []string{
+					"Built from scratch without dependency on game-specific libraries",
+					"Integrated in-app payments for user donations",
 					"Launched on iOS and Android, with hundreds of reviews averaging over four stars",
 					`"No ads, no frills" philosophy treats users as people, not wallets`,
 				},
