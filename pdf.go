@@ -1,4 +1,4 @@
-package main
+package resume
 
 import (
 	"bytes"
@@ -12,6 +12,18 @@ import (
 
 //go:embed fonts/*
 var assets embed.FS
+
+type RGBColor struct {
+	red   int
+	green int
+	blue  int
+}
+
+type PDFSettings struct {
+	color  RGBColor
+	accent RGBColor
+	short  bool
+}
 
 type PageStyle struct {
 	width, margin float64

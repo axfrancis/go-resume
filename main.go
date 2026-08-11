@@ -1,4 +1,4 @@
-package main
+package resume
 
 import (
 	"fmt"
@@ -7,18 +7,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-type RGBColor struct {
-	red   int
-	green int
-	blue  int
-}
-
-type PDFSettings struct {
-	color  RGBColor
-	accent RGBColor
-	short  bool
-}
 
 func parseHex(r *http.Request, name string) (color RGBColor) {
 	s := strings.TrimPrefix(r.URL.Query().Get(name), "#")
@@ -41,7 +29,7 @@ func parseHex(r *http.Request, name string) (color RGBColor) {
 	return
 }
 
-func resume(w http.ResponseWriter, r *http.Request) {
+func Resume(w http.ResponseWriter, r *http.Request) {
 	person := getPerson()
 	settings := PDFSettings{
 		color:  RGBColor{0, 0, 0},
@@ -79,7 +67,7 @@ func main() {
 		port = "3000"
 	}
 
-	http.HandleFunc("/", resume)
+	http.HandleFunc("/", Resume)
 
 	fmt.Println("Listening on :" + port)
 	http.ListenAndServe(":"+port, nil)

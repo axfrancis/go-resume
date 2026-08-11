@@ -1,4 +1,4 @@
-module github.com/axfrancis/GO-GETAJOB
+module github.com/axfrancis/go-resume
 
 go 1.26.5
 

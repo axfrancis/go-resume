@@ -1,4 +1,4 @@
-package main
+package resume
 
 type TechSkill struct {
 	Name      string
